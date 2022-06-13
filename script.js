@@ -4,13 +4,14 @@ const operators = document.querySelectorAll(".operator");
 const equalSign = document.querySelector(".equal-sign");
 const clearBtn = document.querySelector(".all-clear");
 const decimal = document.querySelector(".decimal");
+const percentage = document.querySelector(".percentage");
 
-let prevNumber = '';
-let calculationOperator = '';
-let currentNumber = '0';
+let dataNumbers = [];
+let dataOperators = [];
+let currentNumber = "0";
 
-const updateScreen = (number) => {
-    calculatorScreen.value = number;
+const updateScreen = (screen) => {
+    calculatorScreen.value = screen;
 }
 
 const inputNumber = (number) => {
@@ -29,11 +30,9 @@ numbers.forEach((number) => {
 });
 
 const inputOperator = (operator) => {
-    if (calculationOperator === '') {
-        prevNumber = currentNumber;
-    }
-    calculationOperator = operator;
-    currentNumber = '';
+    dataNumbers.push(currentNumber);
+    dataOperators.push(operator);
+    currentNumber = "0";
 }
 
 operators.forEach((operator) => {
@@ -43,28 +42,32 @@ operators.forEach((operator) => {
 });
 
 const calculate = () => {
-    let result = "";
-    switch (calculationOperator) {
-        case "+":
-            result = parseFloat(prevNumber) + parseFloat(currentNumber);
-            break;
-        case "-":
-            result = parseFloat(prevNumber) - parseFloat(currentNumber);
-            break;
-        case "*":
-            result = parseFloat(prevNumber) * parseFloat(currentNumber);
-            break;
-        case "/":
-            result = parseFloat(prevNumber) / parseFloat(currentNumber);
-            break;
-        default:
-            break;
-    }
+    dataNumbers.push(currentNumber);
 
-    console.log(calculationOperator);
+    let result = dataNumbers.reduce((prevValue, currentValue, currentIndex) => {
+        let outcome;
+        switch (dataOperators[currentIndex - 1]) {
+            case "+":
+                outcome = parseFloat(prevValue) + parseFloat(currentValue);
+                break;
+            case "-":
+                outcome = parseFloat(prevValue) - parseFloat(currentValue);
+                break;
+            case "*":
+                outcome = parseFloat(prevValue) * parseFloat(currentValue);
+                break;
+            case "/":
+                outcome = parseFloat(prevValue) / parseFloat(currentValue);
+                break;
+            default:
+                outcome = currentValue;
+                break;
+        }
+
+        return outcome;
+    });
 
     currentNumber = result;
-    calculationOperator = "";
 }
 
 equalSign.addEventListener("click", () => {
@@ -74,7 +77,6 @@ equalSign.addEventListener("click", () => {
 
 const clearAll = () => {
     prevNumber = '';
-    calculationOperator = '';
     currentNumber = '0';
 }
 
@@ -92,5 +94,14 @@ const inputDecimal = (dot) => {
 
 decimal.addEventListener("click", (event) => {
     inputDecimal(event.target.value);
+    updateScreen(currentNumber);
+});
+
+const inputPercentage = (percent) => {
+    currentNumber = currentNumber / 100;
+}
+
+percentage.addEventListener("click", (event) => {
+    inputPercentage(event.target.value);
     updateScreen(currentNumber);
 });
